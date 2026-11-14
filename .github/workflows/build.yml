@@ -44,8 +44,7 @@ jobs:
           echo "Корень проекта найден: $PROJ_ROOT"
 
           cd "$PROJ_ROOT"
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          gradle assembleDebug --no-daemon
 
       - name: Save Artifact
         uses: actions/upload-artifact@v4
