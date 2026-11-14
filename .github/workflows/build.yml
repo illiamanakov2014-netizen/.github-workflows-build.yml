@@ -12,16 +12,16 @@ jobs:
 
       - name: Find and unzip project
         run: |
-          ZIP_FILE=\$(find . -maxdepth 1 -type f -name "*.zip" | head -1)
+          ZIP_FILE=$(find . -maxdepth 1 -type f -name "*.zip" | head -1)
 
-          if [ -z "\$ZIP_FILE" ]; then
+          if [ -z "$ZIP_FILE" ]; then
             echo "ОШИБКА: Не найден .zip файл в корне репозитория!"
             exit 1
           fi
 
-          echo "Найден архив: \$ZIP_FILE"
+          echo "Найден архив: $ZIP_FILE"
           mkdir -p project
-          unzip -o "\$ZIP_FILE" -d project
+          unzip -o "$ZIP_FILE" -d project
           echo "Содержимое папки project:"
           find project -type f | head -20
 
@@ -38,21 +38,21 @@ jobs:
 
       - name: Find Project Root and Build APK
         run: |
-          PROJ_DIR=\$(find project -type f -name "settings.gradle" | head -1)
+          PROJ_DIR=$(find project -type f -name "settings.gradle" | head -1)
 
-          if [ -z "\$PROJ_DIR" ]; then
+          if [ -z "$PROJ_DIR" ]; then
             echo "ОШИБКА: Не найден settings.gradle внутри архива!"
             exit 1
           fi
 
           PROJ_ROOT=$(dirname "$PROJ_DIR")
-          echo "Корень проекта найден: \$PROJ_ROOT"
+          echo "Корень проекта найден: $PROJ_ROOT"
 
-          cd "\$PROJ_ROOT"
+          cd "$PROJ_ROOT"
           gradle assembleDebug --no-daemon
 
       - name: Save Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug.apk
-          path: project/**/app/build/outputs/apk/debug/app-debug.apk
+          name: MiniDuck-APK
+          path: "**/app/build/outputs/apk/debug/app-debug.apk"
