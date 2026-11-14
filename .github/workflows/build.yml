@@ -7,40 +7,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Распаковка ZIP
+      - name: Unzip
         run: |
           mkdir -p project
-          # Ищем любой ZIP в корне и распаковываем его
-          ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -1)
-          if [ -z "$ZIP_FILE" ]; then
-            echo "❌ Ошибка: В репозитории нет ZIP-архива!"
-            exit 1
-          fi
-          unzip -o "$ZIP_FILE" -d project
-          echo "✅ Распаковано. Список файлов:"
-          ls -R project
+          unzip -o *.zip -d project
+          echo "Распаковано:"
+          find project -type f | head -30
 
-      - name: Установка Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Сборка APK
+      - name: Build APK
         run: |
-          # Ищем settings.gradle, чтобы понять, где корень проекта
-          GRADLE_FILE=$(find project -name settings.gradle | head -1)
-          if [ -z "$GRADLE_FILE" ]; then
-            echo "❌ Ошибка: Не найден settings.gradle внутри ZIP!"
-            exit 1
-          fi
-          PROJ_DIR=$(dirname "$GRADLE_FILE")
-          echo "📂 Проект найден в: $PROJ_DIR"
+          PROJ_DIR=$(dirname "$(find project -name settings.gradle | head -1)")
+          echo "Корень проекта: $PROJ_DIR"
           cd "$PROJ_DIR"
           gradle assembleDebug --no-daemon
 
-      - name: Сохранение результата
+      - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: MiniDuck-APK
           path: "**/app/build/outputs/apk/debug/app-debug.apk"
+          
