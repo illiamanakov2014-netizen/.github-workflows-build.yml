@@ -49,10 +49,14 @@ jobs:
           echo "Корень проекта найден: $PROJ_ROOT"
 
           cd "$PROJ_ROOT"
-          gradle assembleDebug --no-daemon
+          # --warning-mode all покажет, какие именно фичи устарели
+          # --stacktrace даст подробный лог ошибки, если сборка упадёт
+          gradle assembleDebug --no-daemon --warning-mode all --stacktrace
 
       - name: Save Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: MiniDuck-APK
-          path: "**/app/build/outputs/apk/debug/app-debug.apk"
+          path: "**/app/build/outputs/apk/debug/*.apk"
+          if-no-files-found: warn
